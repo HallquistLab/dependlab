@@ -11,13 +11,13 @@ License: GPL-3
 Encoding: UTF-8
 LazyLoad: yes
 LazyData: yes
-RoxygenNote: 7.3.2
 Depends:
     R (>= 3.5.0),
     methods
 Imports:
     cabinets,
     car,
+    cli,
     coda,
     data.table,
     dplyr,
@@ -62,3 +62,4 @@ Imports:
 LinkingTo:
     Rcpp,
     RcppArmadillo
+Config/roxygen2/version: 8.0.0

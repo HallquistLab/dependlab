@@ -8,7 +8,8 @@ match_subIDs_names(
   tracker_df,
   addto_df,
   col_first_name = "FIRSTNAME",
-  col_last_name = "LASTNAME"
+  col_last_name = "LASTNAME",
+  col_email_name = ""
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ match_subIDs_names(
 \item{col_first_name}{name of the column which contains the first name of the subject to match between the tracker and master/screener. default set to "FIRSTNAME" (column in MasterData).}
 
 \item{col_last_name}{name of the column which contains the last name of the subject to match between the tracker and master/screener. default set to "LASTNAME" (column in MasterData).}
+
+\item{col_email_name}{name of the column which contains the email id for subject to be used when name doesn't match}
 }
 \value{
 addto_df dataframe with ID column added in by matching names from study tracker
@@ -31,7 +34,7 @@ use this script to match the name in the tracker and pull the corresponding subj
 \examples{
 \dontrun{
   match_subIDs_names(tracker_df, master_df, col_first_name = "FIRSTNAME", col_last_name = "LASTNAME")
-  match_subIDs_names(tracker_df, screener_df, col_first_name = "ContactForm_1", col_last_name = "ContactForm_2")
+  match_subIDs_names(tracker_df, screener_df, col_first_name = "ContactForm_1", col_last_name = "ContactForm_2", col_email_name = "ContactForm_3")
 }
 
 }

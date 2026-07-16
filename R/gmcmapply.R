@@ -4,7 +4,7 @@
 #' @param FUN user-defined function to apply over variables in mvars. N.B. This function is written to use the names of mvars as formal arguments to FUN. Thus, the majority of FUNs need not require any arguments to be specified. As long as the variable object names in FUN match the names of mvars,  gmapply will handle the translation of names(mvars) to FUN.
 #' @param SIMPLIFY defaults to TRUE, which appends function output to a tibble of the expand.grid-ed mvars. FALSE exports a list, where length(list) = nrow(expand.grid(mvars)). TODO: implement an abstracted function that converts the list to a named, nested list when SIMPLIFY = FALSE.
 #' @param mc.cores number of cores to utilize if running in parallel. Defaults to 1, which implements mapply.
-#' @param ...
+#' @param ... Additional arguments passed to `FUN`.
 #'
 #' @return compiled returns of FUN
 #'
@@ -107,4 +107,3 @@ gmcmapply <- function(mvars, FUN, SIMPLIFY = TRUE, mc.cores = 1, ...){
   }
   return(complete)
 }
-

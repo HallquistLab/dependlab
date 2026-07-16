@@ -8,7 +8,7 @@
 An object of class \code{data.frame} with 200 rows and 6 columns.
 }
 \usage{
-example_events
+data(example_events)
 }
 \description{
 example events structure for build_design_matrix

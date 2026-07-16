@@ -15,7 +15,7 @@ gmcmapply(mvars, FUN, SIMPLIFY = TRUE, mc.cores = 1, ...)
 
 \item{mc.cores}{number of cores to utilize if running in parallel. Defaults to 1, which implements mapply.}
 
-\item{...}{}
+\item{...}{Additional arguments passed to `FUN`.}
 }
 \value{
 compiled returns of FUN

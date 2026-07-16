@@ -17,7 +17,7 @@ A data frame with 30 observations on the following 4 variables.
 \url{https://cran.r-project.org/web/packages/WWGbook/index.html}
 }
 \usage{
-rat.brain
+data(rat.brain)
 }
 \description{
 The data used in this example were originally reported by Douglas, et al. (2004).

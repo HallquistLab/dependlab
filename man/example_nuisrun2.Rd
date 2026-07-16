@@ -8,7 +8,7 @@
 An object of class \code{data.frame} with 300 rows and 2 columns.
 }
 \usage{
-example_nuisrun2
+data(example_nuisrun2)
 }
 \description{
 example nuisance regressors for run2 used in build_design_matrix

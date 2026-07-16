@@ -10,7 +10,7 @@
 #'
 #' @importFrom reshape2 melt
 #' @importFrom ggplot2 ggplot geom_tile theme theme_bw scale_fill_gradient2 geom_text coord_cartesian
-#'   scale_x_discrete scale_y_discrete waiver element_blank xlab ylab
+#' @importFrom ggplot2 scale_x_discrete scale_y_discrete waiver element_blank xlab ylab
 #' @importFrom grid unit
 #' @importFrom scales muted
 #' @importFrom viridis scale_fill_viridis

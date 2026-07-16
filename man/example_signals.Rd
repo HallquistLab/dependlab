@@ -8,7 +8,7 @@
 An object of class \code{list} of length 2.
 }
 \usage{
-example_signals
+data(example_signals)
 }
 \description{
 example signals structure for build_design_matrix
