@@ -2,36 +2,160 @@
 % Please edit documentation in R/jlmer.R
 \name{jlmer}
 \alias{jlmer}
-\title{Replacement for lmer function that uses Julia for fitting the model}
+\title{Fit mixed-effects models with Julia MixedModels}
 \usage{
-jlmer(formula = NULL, data = NULL, REML = TRUE, JULIA_HOME = NULL)
+jlmer(
+  formula,
+  data,
+  REML = TRUE,
+  JULIA_HOME = NULL,
+  family = stats::gaussian(),
+  weights = NULL,
+  na.action = stats::na.omit,
+  lmer_test = FALSE,
+  lmer_test_tol = 1e-08,
+  julia_setup_args = list(),
+  julia_packages = character(),
+  fit_args = list(),
+  keep_julia_model = FALSE,
+  verbose = FALSE,
+  ...
+)
 }
 \arguments{
-\item{formula}{a two-sided linear formula object describing both the fixed-effects and random-effects
-part of the model, with the response on the left of a ~ operator and the terms, 
-separated by + operators, on the right. Random-effects terms are distinguished by vertical bars (|)
-separating expressions for design matrices from grouping factors. Two vertical bars (||) can be used to
-specify multiple uncorrelated random effects for the same grouping variable.}
+\item{formula}{A two-sided mixed-model formula. It must contain at least one
+random-effects term, such as \code{(1 | subject)}.}
 
-\item{data}{a data frame containing the variables named in formula.}
+\item{data}{A data frame containing every variable used in \code{formula}.}
 
-\item{REML}{logical scalar - Should the estimates be chosen to optimize the REML
-criterion (as opposed to the log-likelihood)?}
+\item{REML}{Logical scalar. For Gaussian models, use restricted maximum
+likelihood when \code{TRUE} and maximum likelihood when \code{FALSE}. Generalized
+models are always fitted by maximum likelihood; an explicitly supplied
+\code{REML = TRUE} is ignored with a warning.}
 
-\item{JULIA_HOME}{the location of the Julia installation on your machine. If NULL, JuliaCall::julia_setup
-will search for the location, but may not find it.}
+\item{JULIA_HOME}{Optional path to the Julia installation, passed to
+\code{\link[JuliaCall:julia_setup]{JuliaCall::julia_setup()}}. When \code{NULL}, JuliaCall searches for Julia.}
+
+\item{family}{An R family object, family function, or one of \code{"gaussian"},
+\code{"binomial"}, or \code{"poisson"}. Links supported by the corresponding R
+family constructor can be requested in the usual way, for example
+\code{binomial(link = "probit")}. JellyMe4 currently supports conversion of
+Gaussian identity-link models, Bernoulli/binomial models, and Poisson
+models. Quasi, Gamma, inverse-Gaussian, negative-binomial, and other
+families cannot be converted to an \code{lme4} object and are rejected before
+Julia is started.}
+
+\item{weights}{Optional numeric case weights, or a single character string
+naming a column in \code{data}. For a binomial model, supplying weights selects
+Julia's \code{Binomial()} distribution: the response must be a proportion and
+the weights are the numbers of trials. Without weights, binomial models
+use \code{Bernoulli()} and require a binary response. The \code{cbind(success, failure)} response syntax is not supported by JellyMe4; use a proportion
+plus weights instead.}
+
+\item{na.action}{A missing-data function or its name. The default,
+\code{\link[stats:na.omit]{stats::na.omit()}}, removes rows missing any formula variable or weight
+before transferring data to Julia. \code{\link[stats:na.exclude]{stats::na.exclude()}} also restores
+excluded positions in compatible residual and prediction methods. Use
+\code{NULL} or \code{\link[stats:na.pass]{stats::na.pass()}} to send missing values to Julia unchanged.}
+
+\item{lmer_test}{Logical scalar. If \code{TRUE}, a Gaussian result is converted
+with \code{lmerTest::as_lmerModLmerTest()}. This is unavailable for generalized
+models and requires the suggested R package \code{lmerTest}.}
+
+\item{lmer_test_tol}{Non-negative numeric tolerance passed to
+\code{lmerTest::as_lmerModLmerTest()}.}
+
+\item{julia_setup_args}{Named list of additional arguments passed to
+\code{\link[JuliaCall:julia_setup]{JuliaCall::julia_setup()}}. Supply \code{JULIA_HOME} through its dedicated
+argument instead.}
+
+\item{julia_packages}{Character vector of additional Julia packages to load.
+\code{MixedModels}, \code{RCall}, and \code{JellyMe4} are always loaded. Link types are
+accessed through MixedModels' GLM dependency, so a separate direct Julia
+installation of GLM is not required.}
+
+\item{fit_args}{Named list of additional Julia \code{fit()} keyword arguments.
+Common generalized-model options include \code{nAGQ} and \code{fast}. Values are
+transferred as Julia variables rather than interpolated into code.}
+
+\item{keep_julia_model}{Logical scalar. If \code{TRUE}, retain the fitted model in
+Julia's \code{Main} module and record its variable name in \code{attr(x, "jlmer")}.
+Data, formula, and argument variables are still cleared.}
+
+\item{verbose}{Logical scalar. If \code{TRUE}, print the generated Julia fit call.}
+
+\item{...}{Additional \emph{named} Julia \code{fit()} keyword arguments. These are
+combined with \code{fit_args}; duplicate names are an error.}
 }
 \value{
-An object of class merMod (more specifically, an object of subclass lmerMod), for which many
-  methods are available (e.g. methods(class="merMod"))
+An \code{lmerMod} for a Gaussian model or a \code{glmerMod} for a binomial or
+Poisson model. Gaussian models can optionally be returned as
+\code{lmerModLmerTest}. Backend details, including the family, link, omitted
+rows, and Julia model variable (when retained), are stored in
+\code{attr(result, "jlmer")}.
 }
 \description{
-Replacement for lmer function that uses Julia for fitting the model
+\code{jlmer()} provides an \code{\link[lme4:lmer]{lme4::lmer()}}/\code{\link[lme4:glmer]{lme4::glmer()}}-style interface to
+Julia's MixedModels package. The model is fitted in Julia and converted by
+JellyMe4 to an R \code{lmerMod} (Gaussian) or \code{glmerMod} (binomial or Poisson)
+object. The returned object therefore works with most software that supports
+\code{lme4} models, including \code{emmeans}, \code{broom.mixed}, and \code{ggeffects}.
 }
 \details{
-The MixedModels package in Julia is extremely fast relative to lme4. Thus, this is a drop-in wrapper
-  for lmer. It uses the JellyMe4 package in Julia to return an lmerMod object that can then be passed to
-  all lme4-compatible helper functions, such as those in ggeffects or emmeans.
-  
-  This function requires that MixedModels, RCall, and JellyMe4 all be installed in your Julia environment.
+Julia packages \code{MixedModels}, \code{RCall}, and \code{JellyMe4} must be installed in
+the active Julia environment. \code{jlmer()} does not install or update Julia
+packages. The first Julia fit in an R session can be noticeably slower due
+to Julia's just-in-time compilation.
+
+MixedModels uses \code{Bernoulli()} for an unaggregated 0/1 response and
+\code{Binomial()} for a response expressed as successes/trials with the trial
+counts supplied as case weights. This differs slightly from R, where both
+representations are called \code{binomial}.
+
+JellyMe4 warns that some numerical accuracy is lost while reconstructing a
+\code{glmerMod}. The Julia fit supplies the estimates, but inferential workflows
+should still compare important results with a native fit when feasible.
+}
+\examples{
+\dontrun{
+# Gaussian LMM (REML by default)
+fit_gaussian <- jlmer(
+  Reaction ~ Days + (Days | Subject),
+  data = lme4::sleepstudy
+)
+summary(fit_gaussian)
+
+# Binary logistic GLMM. A noncanonical link can be supplied as, for example,
+# family = binomial(link = "probit").
+set.seed(1)
+binary_data <- transform(
+  lme4::sleepstudy,
+  responded = rbinom(nrow(lme4::sleepstudy), 1, plogis(-1 + Days / 5))
+)
+fit_binary <- jlmer(
+  responded ~ Days + (1 | Subject),
+  data = binary_data,
+  family = binomial()
+)
+
+# Aggregated binomial GLMM: response is a proportion and weights are trials.
+cbpp <- transform(lme4::cbpp, proportion = incidence / size)
+fit_binomial <- jlmer(
+  proportion ~ period + (1 | herd),
+  data = cbpp,
+  family = binomial(),
+  weights = "size",
+  nAGQ = 9
+)
+
+# Poisson log-link GLMM for counts.
+data("grouseticks", package = "lme4")
+fit_poisson <- jlmer(
+  TICKS ~ YEAR + cHEIGHT + (1 | BROOD) + (1 | LOCATION),
+  data = grouseticks,
+  family = poisson(),
+  fast = TRUE
+)
+}
+
 }

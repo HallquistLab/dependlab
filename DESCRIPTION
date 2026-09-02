@@ -26,7 +26,6 @@ Imports:
     forecast,
     fs,
     ggplot2,
-    glue,
     Hmisc,
     janitor,
     JuliaCall,
@@ -62,4 +61,8 @@ Imports:
 LinkingTo:
     Rcpp,
     RcppArmadillo
+Suggests:
+    lmerTest,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
 Config/roxygen2/version: 8.0.0
